@@ -1,21 +1,22 @@
 // Created by plusminus on 21:46:41 - 25.09.2008
 package org.osmdroid.tileprovider.modules;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
+import android.graphics.drawable.Drawable;
 
 import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.MapTile;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileRequestState;
+import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderTilesFolder;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.util.StreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.graphics.drawable.Drawable;
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A tile provider that can serve tiles from an archive using the supplied tile source. The tile
@@ -157,7 +158,7 @@ public class MapTileFileArchiveProvider extends MapTileFileStorageProviderBase {
 		}
 
 		// path should be optionally configurable
-		final File[] files = OSMDROID_PATH.listFiles();
+		final File[] files = OpenStreetMapTileProviderTilesFolder.OSMDROID_PATH.listFiles();
 		if (files != null) {
 			for (final File file : files) {
 				final IArchiveFile archiveFile = ArchiveFileFactory.getArchiveFile(file);
