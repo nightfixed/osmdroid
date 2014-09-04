@@ -36,10 +36,13 @@ import java.lang.reflect.Field;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.contributor.GpxToPHPUploader;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.constants.GeoConstants;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.Projection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -52,6 +55,8 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 public class ScaleBarOverlay extends Overlay implements GeoConstants {
+
+	private static final Logger logger = LoggerFactory.getLogger(ScaleBarOverlay.class);
 
 	// ===========================================================
 	// Fields
@@ -88,6 +93,7 @@ public class ScaleBarOverlay extends Overlay implements GeoConstants {
 	public float ydpi;
 	public int screenWidth;
 	public int screenHeight;
+	private float bgOffset = -1f;
 
 	private final ResourceProxy resourceProxy;
 	private Paint barPaint;
@@ -162,6 +168,7 @@ public class ScaleBarOverlay extends Overlay implements GeoConstants {
 
 		// set default max length to 1 inch
 		maxLength = 2.54f;
+		logger.info("----------Scalebar overlay constructor----------");
 	}
 
 	// ===========================================================
@@ -317,6 +324,21 @@ public class ScaleBarOverlay extends Overlay implements GeoConstants {
 	}
 
 	/**
+	 * Sets the offset representing size of the background that will enclose the scalebar, and gets
+	 * drawn behind the scalebar. Set this to -1 to disable it. (disabled by default)
+	 * 
+	 * @see {@link ScaleBarOverlay#setBackgroundPaint}
+	 * 
+	 * @param pBgOffset
+	 *            - the background offset, around the scalebar
+	 * 
+	 */
+	public void setBackgroundOffset(final float pBgOffset) {
+		bgOffset = pBgOffset;
+		lastZoomLevel = -1; // Force redraw of scalebar
+	}
+
+	/**
 	 * If enabled, the bar will automatically adjust the length to reflect a round number (starting
 	 * with 1, 2 or 5). If disabled, the bar will always be drawn in full length representing a
 	 * fractional distance.
@@ -381,7 +403,14 @@ public class ScaleBarOverlay extends Overlay implements GeoConstants {
 			c.save();
 			c.concat(projection.getInvertedScaleRotateCanvasMatrix());
 			c.translate(offsetX, offsetY);
-
+			if (latitudeBar && bgPaint != null && bgOffset != 0) {
+				Rect latitudeBarRectWithOffset = new Rect();
+				latitudeBarRectWithOffset.set((int) (latitudeBarRect.left - bgOffset),
+						(int) (latitudeBarRect.top - bgOffset),
+						(int) (latitudeBarRect.right + bgOffset),
+						(int) (latitudeBarRect.bottom + bgOffset));
+				c.drawRect(latitudeBarRectWithOffset, bgPaint);
+			}
 			if (latitudeBar && bgPaint != null)
 				c.drawRect(latitudeBarRect, bgPaint);
 			if (longitudeBar && bgPaint != null) {

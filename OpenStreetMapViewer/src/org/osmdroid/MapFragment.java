@@ -17,6 +17,8 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -115,11 +117,18 @@ public class MapFragment extends Fragment implements OpenStreetMapConstants
 
 		mScaleBarOverlay = new ScaleBarOverlay(context);
 		mScaleBarOverlay.setCentred(true);
-		mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
-
+		mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 50);
+		// ===========================================================
+	    // Setup Scalebar background paint, color and background offset
+	    // ===========================================================
+		Paint pBgPaint = new Paint();
+		pBgPaint.setColor(Color.argb(255, 217, 218, 220));//a light shade of grey
+		pBgPaint.setStyle(Paint.Style.FILL);
+		mScaleBarOverlay.setBackgroundPaint(pBgPaint);
+		mScaleBarOverlay.setBackgroundOffset(dm.density * 5);//just enough to enclose the scalebar
+		//=============================================================
         mRotationGestureOverlay = new RotationGestureOverlay(context, mMapView);
 		mRotationGestureOverlay.setEnabled(false);
-
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
         mMapView.getOverlays().add(this.mLocationOverlay);
